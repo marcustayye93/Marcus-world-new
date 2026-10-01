@@ -1,0 +1,439 @@
+/*
+ * OverworldMap — Interactive pixel art map with clickable building zones
+ * Design: Top-down RPG overworld. Click on buildings to explore zones.
+ * The Meta Emerald City is the grand centerpiece.
+ * No character movement — pure click-to-explore.
+ * Chesa's map (2026-10-01): full composite with all 8 pill labels baked in.
+ * Overlay labels/sprites removed; only year subtitles + invisible hotspots remain.
+ * 
+ * MOBILE: Map is wider than viewport, users can swipe/drag horizontally to pan.
+ * Starts centered on Meta HQ, with a subtle hint arrow animation.
+ */
+
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { ASSET_URLS, type Zone } from "@/lib/gameData";
+import AmbientAnimations from "@/components/AmbientAnimations";
+
+interface OverworldMapProps {
+  zones: Zone[];
+  discoveredZones: Set<string>;
+  onZoneClick: (zone: Zone) => void;
+  onSnapshotClick?: () => void;
+}
+
+// Clickable hotspot areas over each building (percentage of map)
+const BUILDING_HOTSPOTS: Record<string, {
+  x: number; y: number; w: number; h: number;
+}> = {
+  meta:       { x: 39, y: 8,  w: 22, h: 30 },
+  dfs:        { x: 12, y: 8,  w: 16, h: 30 },
+  music:      { x: 67, y: 10, w: 17, h: 28 },
+  university: { x: 11, y: 52, w: 18, h: 30 },
+  farm:       { x: 62, y: 35, w: 17, h: 25 },
+  coffee:     { x: 72, y: 52, w: 17, h: 30 },
+  ai:         { x: 24, y: 30, w: 16, h: 28 },
+  workshop:   { x: 41, y: 52, w: 18, h: 30 },
+};
+
+// Keyboard navigation order — spatial layout: top to bottom, left to right
+const KEYBOARD_NAV_ORDER = ["meta", "dfs", "music", "workshop", "ai", "university", "farm", "coffee"];
+
+export default function OverworldMap({ zones, discoveredZones, onZoneClick, onSnapshotClick }: OverworldMapProps) {
+  const [hoveredZone, setHoveredZone] = useState<string | null>(null);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [isMobile, setIsMobile] = useState(false);
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Touch panning state
+  const x = useMotionValue(0);
+  const touchStartX = useRef(0);
+  const touchStartMotionX = useRef(0);
+  const isDragging = useRef(false);
+  const dragDistance = useRef(0);
+
+  // Mobile: map is 260vw wide so ALL buildings are fully visible when swiping
+  // DFS Group & University on the far left, Coffee Shop on the far right
+  const MAP_WIDTH_VW = 260;
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Center the map on Meta HQ initially (Meta is at ~47.5% of map width)
+  useEffect(() => {
+    if (isMobile) {
+      const viewportWidth = window.innerWidth;
+      const mapWidth = (MAP_WIDTH_VW / 100) * viewportWidth;
+      const metaCenterX = 0.475 * mapWidth;
+      const initialX = -(metaCenterX - viewportWidth / 2);
+      const maxDrag = -(mapWidth - viewportWidth);
+      const clampedX = Math.max(maxDrag, Math.min(0, initialX));
+      x.set(clampedX);
+    }
+  }, [isMobile, x]);
+
+  // Hide swipe hint after first interaction
+  const hideHint = useCallback(() => {
+    if (showSwipeHint) setShowSwipeHint(false);
+  }, [showSwipeHint]);
+
+  const getClampedX = useCallback((rawX: number) => {
+    if (!isMobile) return 0;
+    const viewportWidth = window.innerWidth;
+    const mapWidth = (MAP_WIDTH_VW / 100) * viewportWidth;
+    const maxDrag = -(mapWidth - viewportWidth);
+    return Math.max(maxDrag, Math.min(0, rawX));
+  }, [isMobile]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartMotionX.current = x.get();
+    isDragging.current = false;
+    dragDistance.current = 0;
+  }, [x]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    const deltaX = e.touches[0].clientX - touchStartX.current;
+    dragDistance.current = Math.abs(deltaX);
+    if (dragDistance.current > 5) {
+      isDragging.current = true;
+      hideHint();
+    }
+    const newX = touchStartMotionX.current + deltaX;
+    x.set(getClampedX(newX));
+  }, [x, getClampedX, hideHint]);
+
+  const handleTouchEnd = useCallback(() => {
+    // Snap with momentum
+    const currentX = x.get();
+    const clampedX = getClampedX(currentX);
+    if (currentX !== clampedX) {
+      animate(x, clampedX, { type: "spring", stiffness: 300, damping: 30 });
+    }
+    // Reset drag state after a short delay to prevent click-through
+    setTimeout(() => {
+      isDragging.current = false;
+    }, 50);
+  }, [x, getClampedX]);
+
+  const handleZoneClick = useCallback((zone: Zone) => {
+    // On mobile, don't trigger click if user was dragging/swiping
+    if (isMobile && dragDistance.current > 10) return;
+    onZoneClick(zone);
+  }, [isMobile, onZoneClick]);
+
+  // Keyboard navigation — arrow keys / Tab to cycle, Enter to open
+  useEffect(() => {
+    if (isMobile) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle when no modal is open (check if body has modal overlay)
+      const hasModal = document.querySelector('[class*="fixed inset-0"]');
+      if (hasModal) return;
+
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        setFocusedIndex((prev) => {
+          const next = prev >= KEYBOARD_NAV_ORDER.length - 1 ? 0 : prev + 1;
+          setHoveredZone(KEYBOARD_NAV_ORDER[next]);
+          return next;
+        });
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        setFocusedIndex((prev) => {
+          const next = prev <= 0 ? KEYBOARD_NAV_ORDER.length - 1 : prev - 1;
+          setHoveredZone(KEYBOARD_NAV_ORDER[next]);
+          return next;
+        });
+      } else if (e.key === "Enter" && focusedIndex >= 0) {
+        const zoneId = KEYBOARD_NAV_ORDER[focusedIndex];
+        const zone = zones.find((z) => z.id === zoneId);
+        if (zone) onZoneClick(zone);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isMobile, focusedIndex, zones, onZoneClick]);
+
+  // Desktop: normal layout. Mobile: wider pannable map.
+  const mapStyle = isMobile
+    ? { width: `${MAP_WIDTH_VW}vw`, height: "100%" }
+    : { width: "100%", height: "100%" };
+
+  return (
+    <div
+      className="relative w-full select-none overflow-hidden"
+      style={{ height: "calc(100vh - 85px)", marginTop: "85px" }}
+      ref={containerRef}
+    >
+      {/* Pannable map container */}
+      <motion.div
+        className="relative h-full"
+        style={isMobile ? { x, ...mapStyle } : mapStyle}
+        onTouchStart={isMobile ? handleTouchStart : undefined}
+        onTouchMove={isMobile ? handleTouchMove : undefined}
+        onTouchEnd={isMobile ? handleTouchEnd : undefined}
+      >
+        {/* Map background */}
+        <div
+          className="absolute inset-0 pixel-render"
+          style={{
+            backgroundImage: `url(${ASSET_URLS.overworld})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+
+        {/* Ambient animations — clouds, birds, smoke, sparkles */}
+        <AmbientAnimations />
+
+        {/* Clickable building hotspots */}
+        {zones.map((zone) => {
+          const hotspot = BUILDING_HOTSPOTS[zone.id];
+          if (!hotspot) return null;
+          const isDiscovered = discoveredZones.has(zone.id);
+          const isHovered = hoveredZone === zone.id;
+          const isFocused = KEYBOARD_NAV_ORDER[focusedIndex] === zone.id;
+          const isHighlighted = isHovered || isFocused;
+          const isMeta = zone.id === "meta";
+
+          return (
+            <motion.button
+              key={zone.id}
+              aria-label={`Explore ${zone.name} — ${zone.tagline}`}
+              className="absolute z-10 rounded-lg cursor-pointer"
+              style={{
+                left: `${hotspot.x}%`,
+                top: `${hotspot.y}%`,
+                width: `${hotspot.w}%`,
+                height: `${hotspot.h}%`,
+              }}
+              onClick={() => handleZoneClick(zone)}
+              onMouseEnter={() => setHoveredZone(zone.id)}
+              onMouseLeave={() => setHoveredZone(null)}
+              whileTap={{ scale: 0.98 }}
+            >
+              {/* Hover glow effect */}
+              <motion.div
+                className="absolute inset-0 rounded-lg pointer-events-none"
+                style={{
+                  background: `radial-gradient(ellipse at center, ${zone.color}35 0%, ${zone.color}15 40%, transparent 70%)`,
+                  border: `2px solid ${zone.color}50`,
+                  boxShadow: `0 0 20px ${zone.color}30, inset 0 0 20px ${zone.color}15`,
+                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isHighlighted ? 1 : 0 }}
+                transition={{ duration: 0.25 }}
+              />
+
+              {/* Discovered checkmark badge */}
+              {isDiscovered && (
+                <motion.div
+                  className="absolute -top-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center z-20"
+                  style={{
+                    background: zone.color,
+                    border: "2px solid white",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+                  }}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                >
+                  <span className="text-white text-xs font-bold">✓</span>
+                </motion.div>
+              )}
+
+              {/* Floating tooltip on hover (desktop only) */}
+              {!isMobile && (
+                <motion.div
+                  className="absolute left-1/2 -translate-x-1/2 z-20 pointer-events-none"
+                  style={isMeta ? { top: "calc(100% + 8px)" } : { bottom: "calc(100% + 8px)" }}
+                  initial={{ opacity: 0, y: isMeta ? -8 : 8 }}
+                  animate={{ opacity: isHighlighted ? 1 : 0, y: isHighlighted ? 0 : (isMeta ? -8 : 8) }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {isMeta && (
+                    <div
+                      className="w-0 h-0 mx-auto mb-0"
+                      style={{
+                        borderLeft: "6px solid transparent",
+                        borderRight: "6px solid transparent",
+                        borderBottom: "6px solid rgba(0,0,0,0.85)",
+                      }}
+                    />
+                  )}
+                  <div
+                    className="px-3 py-2 rounded-lg whitespace-nowrap text-center"
+                    style={{
+                      background: "rgba(0,0,0,0.85)",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                    }}
+                  >
+                    <span className="text-sm mr-1.5">{zone.icon}</span>
+                    <span className="pixel-text text-[7px] sm:text-[8px] text-white">
+                      {zone.name}
+                    </span>
+                    <p
+                      className="text-[10px] text-white/60 mt-0.5"
+                      style={{ fontFamily: "'Nunito', sans-serif" }}
+                    >
+                      {zone.tagline}
+                    </p>
+                  </div>
+                  {!isMeta && (
+                    <div
+                      className="w-0 h-0 mx-auto"
+                      style={{
+                        borderLeft: "6px solid transparent",
+                        borderRight: "6px solid transparent",
+                        borderTop: "6px solid rgba(0,0,0,0.85)",
+                      }}
+                    />
+                  )}
+                </motion.div>
+              )}
+
+              {/* Pulsing indicator for undiscovered zones */}
+              {!isDiscovered && !isHovered && (
+                <motion.div
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                  animate={{
+                    scale: [1, 1.4, 1],
+                    opacity: [0.6, 0.2, 0.6],
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <div
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
+                    style={{
+                      background: `radial-gradient(circle, ${zone.color}50 0%, transparent 70%)`,
+                    }}
+                  />
+                </motion.div>
+              )}
+            </motion.button>
+          );
+        })}
+
+        {/* Résumé Snapshot button — floating scroll/parchment style */}
+        {onSnapshotClick && (
+          <motion.button
+            aria-label="Open Marcus at a Glance résumé snapshot"
+            className="absolute z-20 cursor-pointer group"
+            style={{ left: "1%", top: "12%", width: isMobile ? "8%" : "5.5%", height: "10%" }}
+            onClick={onSnapshotClick}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            title="Marcus at a Glance"
+          >
+            <motion.div
+              className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-30 pointer-events-none whitespace-nowrap"
+              initial={{ opacity: 0, x: -8 }}
+              whileHover={{ opacity: 1, x: 0 }}
+            >
+              <div
+                className="px-3 py-2 rounded-lg"
+                style={{
+                  background: "rgba(0,0,0,0.85)",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                }}
+              >
+                <span className="pixel-text text-[7px] sm:text-[8px] text-white">
+                  MARCUS AT A GLANCE
+                </span>
+                <p
+                  className="text-[10px] text-white/60 mt-0.5"
+                  style={{ fontFamily: "'Nunito', sans-serif" }}
+                >
+                  One-sheet résumé snapshot
+                </p>
+              </div>
+            </motion.div>
+          </motion.button>
+        )}
+      </motion.div>
+
+      {/* Mobile swipe hint — shows on first load, fades after interaction */}
+      {isMobile && showSwipeHint && (
+        <motion.div
+          className="absolute bottom-16 left-1/2 -translate-x-1/2 z-30"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <div
+            className="px-4 py-2.5 rounded-full flex items-center gap-2"
+            style={{
+              background: "rgba(0,0,0,0.75)",
+              backdropFilter: "blur(4px)",
+              border: "1px solid rgba(255,255,255,0.15)",
+            }}
+          >
+            <motion.span
+              animate={{ x: [-8, 8, -8] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              className="text-lg"
+            >
+              👆
+            </motion.span>
+            <span className="pixel-text text-[7px] text-white/90">
+              SWIPE TO EXPLORE MAP
+            </span>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Desktop instruction hint at bottom */}
+      {!isMobile && (
+        <motion.div
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1 }}
+        >
+          <div
+            className="px-4 py-2 rounded-full"
+            style={{
+              background: "rgba(0,0,0,0.6)",
+              backdropFilter: "blur(4px)",
+            }}
+          >
+            <span className="pixel-text text-[6px] sm:text-[7px] text-white/80">
+              CLICK ON BUILDINGS TO EXPLORE
+            </span>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Persistent LinkedIn CTA — floating bottom-left */}
+      <motion.a
+        href="https://www.linkedin.com/in/mtye/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute bottom-4 left-4 z-30 flex items-center gap-2 px-4 py-2.5 rounded-full cursor-pointer group"
+        style={{
+          background: "linear-gradient(135deg, #0077B5 0%, #005885 100%)",
+          border: "2px solid rgba(255,255,255,0.25)",
+          boxShadow: "0 4px 16px rgba(0,119,181,0.35), 0 2px 4px rgba(0,0,0,0.2)",
+        }}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 1.5, type: "spring", stiffness: 200 }}
+        whileHover={{ scale: 1.05, boxShadow: "0 6px 24px rgba(0,119,181,0.5)" }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+        <span className="pixel-text text-[7px] sm:text-[8px] text-white tracking-wide">
+          LET'S CONNECT
+        </span>
+      </motion.a>
+    </div>
+  );
+}
