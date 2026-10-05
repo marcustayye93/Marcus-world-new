@@ -223,7 +223,7 @@ export default function WorkshopModal({ onClose }: WorkshopModalProps) {
                 THE WORKSHOP
               </h2>
               <p className="text-xs sm:text-sm font-semibold" style={{ fontFamily: "'Nunito', sans-serif", color: "#FFE8C9" }}>
-                Every build is a crafted item.
+                Every build is a crafted item of mine.
               </p>
             </div>
           </div>
@@ -246,10 +246,10 @@ export default function WorkshopModal({ onClose }: WorkshopModalProps) {
               <motion.div key="grid" exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.18 }}>
                 <div className="space-y-3 mb-6">
                   <p className="text-sm sm:text-[15px] leading-relaxed" style={{ fontFamily: "'Nunito', sans-serif", color: "#4a4540" }}>
-                    Everything I've built, in one inventory.
+                    I built these projects based on personal interests or curiosities that I've had.
                   </p>
                   <p className="text-sm sm:text-[15px] leading-relaxed" style={{ fontFamily: "'Nunito', sans-serif", color: "#4a4540" }}>
-                    Ten projects, each one live and playable, spanning finance, food, travel, and family.
+                    I've kept all ten of them live and playable, spanning finance, food, travel, and family.
                   </p>
                   <p className="text-sm sm:text-[15px] leading-relaxed" style={{ fontFamily: "'Nunito', sans-serif", color: "#4a4540" }}>
                     Tap any item to inspect it, then go play the demo yourself.
