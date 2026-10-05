@@ -295,7 +295,7 @@ export const ZONES: Zone[] = [
     name: "The Workshop",
     icon: "\uD83D\uDD28",
     tagline: "Every build is a crafted item.",
-    description: "Outside work, I turn ideas into things you can touch. An idea becomes something fun, something interactive, something I can share with the people I love. Nine projects so far. Eight you can play right now, one still in the forge. Tap any item to inspect it, then go try the demo yourself.",
+    description: "Outside work, I turn ideas into things you can touch. An idea becomes something fun, something interactive, something I can share with the people I love. Ten projects so far, all live and playable. Tap any item to inspect it, then go try the demo yourself.",
     image: "/workshop-icons/icon-gethowmuch.webp",
     color: "#B87333",
     bgGradient: "from-amber-600/10 to-orange-800/10",

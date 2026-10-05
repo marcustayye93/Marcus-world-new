@@ -249,7 +249,7 @@ export default function WorkshopModal({ onClose }: WorkshopModalProps) {
                     Everything I've built, in one inventory.
                   </p>
                   <p className="text-sm sm:text-[15px] leading-relaxed" style={{ fontFamily: "'Nunito', sans-serif", color: "#4a4540" }}>
-                    Nine projects, each one live and playable, spanning finance, food, travel, and family.
+                    Ten projects, each one live and playable, spanning finance, food, travel, and family.
                   </p>
                   <p className="text-sm sm:text-[15px] leading-relaxed" style={{ fontFamily: "'Nunito', sans-serif", color: "#4a4540" }}>
                     Tap any item to inspect it, then go play the demo yourself.
@@ -277,7 +277,7 @@ export default function WorkshopModal({ onClose }: WorkshopModalProps) {
           style={{ borderColor: `${COPPER}30`, background: `${COPPER}10` }}
         >
           <span className="pixel-text text-[6px] sm:text-[7px] opacity-40">
-            {selected ? "ITEM INSPECTED" : "9 ITEMS IN INVENTORY"}
+            {selected ? "ITEM INSPECTED" : "10 ITEMS IN INVENTORY"}
           </span>
           <button
             aria-label="Close the workshop"

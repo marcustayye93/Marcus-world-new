@@ -18,6 +18,19 @@ export interface WorkshopProject {
 
 export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
+    id: "hawkerwhere",
+    name: "HawkerWhere",
+    icon: "/workshop-icons/icon-hawkerwhere.webp",
+    tagline: "Your local dish companion.",
+    writeup: [
+      "Pick a dish, and I will show you every hawker stall in Singapore that sells it, rated and mapped.",
+      "I built it because the question is never which hawker centre to visit. It is where to get the best version of the one dish you are craving today. So the search starts with the food, not the place.",
+      "Bib Gourmand stalls are flagged, kopitiam stalls are in, and the whole island is searchable in one tap.",
+    ],
+    demoUrl: "https://hawkerwhere.com",
+    linkLabel: "Play the demo here",
+  },
+  {
     id: "gethowmuch",
     name: "GetHowMuch",
     icon: "/workshop-icons/icon-gethowmuch.webp",
@@ -122,12 +135,12 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
     id: "stock-picker",
     name: "Stock Picker",
     icon: "/workshop-icons/icon-stock-picker.webp",
-    tagline: "In the forge.",
+    tagline: "Find stocks worth a look.",
     writeup: [
-      "I'm building a stock research companion with an intrinsic value calculator, a quality scorecard, a screener, and a watchlist with price alerts.",
-      "Still in the workshop. Check back soon.",
+      "A stock research companion with an intrinsic value calculator, a quality scorecard, a screener, and a watchlist with price alerts.",
+      "Live and running. Go try it.",
     ],
-    demoUrl: null,
-    linkLabel: "Coming soon",
+    demoUrl: "https://vibrant-imagination-production-d8a8.up.railway.app",
+    linkLabel: "Try it live",
   },
 ];
