@@ -29,6 +29,7 @@ export interface Testimonial {
   quote: string;
 }
 
+const ICON_BASE = `${import.meta.env.BASE_URL}workshop-icons`;
 const ASSET_BASE = `${import.meta.env.BASE_URL}assets`;
 export const ASSET_URLS = {
   overworld: `${ASSET_BASE}/overworld.png`,
@@ -296,7 +297,7 @@ export const ZONES: Zone[] = [
     icon: "\uD83D\uDD28",
     tagline: "Every build is a crafted item.",
     description: "Outside work, I turn ideas into things you can touch. An idea becomes something fun, something interactive, something I can share with the people I love. Ten projects so far, all live and playable. Tap any item to inspect it, then go try the demo yourself.",
-    image: "/workshop-icons/icon-gethowmuch.webp",
+    image: `${ICON_BASE}/icon-gethowmuch.webp`,
     color: "#B87333",
     bgGradient: "from-amber-600/10 to-orange-800/10",
     details: [],

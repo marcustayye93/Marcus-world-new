@@ -16,11 +16,13 @@ export interface WorkshopProject {
   linkLabel: string;
 }
 
+const ICON_BASE = `${import.meta.env.BASE_URL}workshop-icons`;
+
 export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
     id: "hawkerwhere",
     name: "HawkerWhere",
-    icon: "/workshop-icons/icon-hawkerwhere.webp",
+    icon: `${ICON_BASE}/icon-hawkerwhere.webp`,
     tagline: "Your local dish companion.",
     writeup: [
       "Pick a dish, and I will show you every hawker stall in Singapore that sells it, rated and mapped.",
@@ -33,7 +35,7 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
     id: "gethowmuch",
     name: "GetHowMuch",
-    icon: "/workshop-icons/icon-gethowmuch.webp",
+    icon: `${ICON_BASE}/icon-gethowmuch.webp`,
     tagline: "Finance made easy for Singaporeans.",
     writeup: [
       "I built GetHowMuch around one mission: finance made easy for Singaporeans.",
@@ -46,7 +48,7 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
     id: "singapore-adventure",
     name: "Singapore Adventure",
-    icon: "/workshop-icons/icon-singapore-adventure.webp",
+    icon: `${ICON_BASE}/icon-singapore-adventure.webp`,
     tagline: "Never a boring weekend again.",
     writeup: [
       "Chesa and I kept ending up at the same three malls every weekend.",
@@ -58,7 +60,7 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
     id: "queensland-adventure",
     name: "Queensland Adventure",
-    icon: "/workshop-icons/icon-queensland-adventure.webp",
+    icon: `${ICON_BASE}/icon-queensland-adventure.webp`,
     tagline: "Weekends, solved for Queensland families.",
     writeup: [
       "After the Singapore version, I took the same idea to Queensland for families planning weekends and school holidays.",
@@ -71,7 +73,7 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
     id: "sydney-adventure",
     name: "Sydney Adventure",
-    icon: "/workshop-icons/icon-sydney-adventure.webp",
+    icon: `${ICON_BASE}/icon-sydney-adventure.webp`,
     tagline: "Sydney and New South Wales, after dark and beyond.",
     writeup: [
       "The third in the Adventure series, this time for the grown-ups.",
@@ -84,7 +86,7 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
     id: "wobbles-handbook",
     name: "Wobbles Handbook",
-    icon: "/workshop-icons/icon-wobbles.webp",
+    icon: `${ICON_BASE}/icon-wobbles.webp`,
     tagline: "The complete care manual for one very good puppy.",
     writeup: [
       "When Paddington came home, I needed everything about him in one place, so I built it.",
@@ -96,7 +98,7 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
     id: "pizzaclub",
     name: "Marco's Pizza Club",
-    icon: "/workshop-icons/icon-pizza-club.webp",
+    icon: `${ICON_BASE}/icon-pizza-club.webp`,
     tagline: "Pizza science for home ovens.",
     writeup: [
       "I got obsessed with making real pizza in a normal home oven, and this is the result.",
@@ -109,7 +111,7 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
     id: "meat-mastery",
     name: "Meat Mastery",
-    icon: "/workshop-icons/icon-meat-mastery.webp",
+    icon: `${ICON_BASE}/icon-meat-mastery.webp`,
     tagline: "Burgers and steaks, mastered.",
     writeup: [
       "My other food obsession.",
@@ -122,7 +124,7 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
     id: "schuur80",
     name: "Schuur 80",
-    icon: "/workshop-icons/icon-schuur80.webp",
+    icon: `${ICON_BASE}/icon-schuur80.webp`,
     tagline: "A heritage barn, in your pocket.",
     writeup: [
       "I built this guest companion for Schuur 80, a restored heritage barn in Belgium.",
@@ -134,7 +136,7 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
     id: "stock-picker",
     name: "Stock Picker",
-    icon: "/workshop-icons/icon-stock-picker.webp",
+    icon: `${ICON_BASE}/icon-stock-picker.webp`,
     tagline: "Find stocks worth a look.",
     writeup: [
       "A stock research companion with an intrinsic value calculator, a quality scorecard, a screener, and a watchlist with price alerts.",
