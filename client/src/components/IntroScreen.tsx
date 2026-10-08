@@ -202,26 +202,8 @@ export default function IntroScreen({ onStart, onSkipToResume, onImmersionSelect
           animate={{ opacity: 1 }}
           transition={{ delay: 1.0 }}
         >
-          Client success leader at Meta by day. Builder of products, businesses, and pixel worlds by night.
+          Client success hero at Meta by day. I know what my clients need, I bring the energy, and I build products, businesses, and pixel worlds by night.
         </motion.p>
-
-        {/* Logo cloud — brands worked with */}
-        <motion.div
-          className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mb-4 max-w-sm mx-auto"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.1 }}
-        >
-          {["Meta", "DFS Group", "Louis Vuitton", "Adidas", "AgriG8", "NUS"].map((brand, i) => (
-            <span
-              key={brand}
-              className="text-[9px] sm:text-[10px] text-white/30 tracking-wide"
-              style={{ fontFamily: "'Nunito', sans-serif" }}
-            >
-              {brand}
-            </span>
-          ))}
-        </motion.div>
 
         {/* Start button */}
         <motion.div
@@ -268,7 +250,7 @@ export default function IntroScreen({ onStart, onSkipToResume, onImmersionSelect
                 {[
                   { mode: "full" as const, label: "Full Adventure", icon: "⚔️", desc: "Explore everything" },
                   { mode: "quick" as const, label: "Quick Tour", icon: "⚡", desc: "Highlights only" },
-                  { mode: "resume" as const, label: "Just the Résumé", icon: "📄", desc: "Skip to resume" },
+                  { mode: "resume" as const, label: "Just the Resume", icon: "📄", desc: "Skip to resume" },
                 ].map((option, i) => (
                   <motion.button
                     key={option.mode}

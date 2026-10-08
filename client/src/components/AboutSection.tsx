@@ -176,7 +176,7 @@ export default function AboutSection({ onClose }: AboutSectionProps) {
           >
             <p className="pixel-text text-[6px] sm:text-[7px] text-emerald-600 mb-1 tracking-widest">IN SHORT</p>
             <p className="text-sm text-gray-700 font-semibold" style={{ fontFamily: "'Nunito', sans-serif" }}>
-              Client success leader at Meta by day. Builder of products, businesses, and pixel worlds by night.
+              Client success hero at Meta by day. I know what my clients need, I bring the energy, and I build products, businesses, and pixel worlds by night.
             </p>
             <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: "'Nunito', sans-serif" }}>
               Deep platform expertise. AI-native. Passionate about helping businesses adopt technology practically.

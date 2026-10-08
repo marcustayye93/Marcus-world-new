@@ -169,7 +169,7 @@ export default function ResumeSnapshot({ onClose }: ResumeSnapshotProps) {
               className="text-xs sm:text-[13px] text-gray-600 leading-relaxed"
               style={{ fontFamily: "'Nunito', sans-serif" }}
             >
-              Client success leader at Meta by day. Builder of products, businesses, and pixel worlds by night. I earned the highest client satisfaction score in APAC (100/100) and build scalable frameworks that help clients succeed on complex platforms. AI-native operator passionate about helping businesses adopt emerging tools practically.
+              Client success hero at Meta by day. I know what my clients need, I bring the energy, and I build products, businesses, and pixel worlds by night. I earned the highest client satisfaction score in APAC (100/100) and build scalable frameworks that help clients succeed on complex platforms. AI-native operator passionate about helping businesses adopt emerging tools practically.
             </p>
           </motion.div>
 
