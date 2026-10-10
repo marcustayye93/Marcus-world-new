@@ -37,7 +37,7 @@ const BUILDING_HOTSPOTS: Record<string, {
 };
 
 // Keyboard navigation order — spatial layout: top to bottom, left to right
-const KEYBOARD_NAV_ORDER = ["meta", "dfs", "music", "workshop", "ai", "university", "farm", "coffee"];
+const KEYBOARD_NAV_ORDER = ["dfs", "meta", "music", "ai", "farm", "university", "workshop", "coffee"];
 
 export default function OverworldMap({ zones, discoveredZones, onZoneClick, onSnapshotClick }: OverworldMapProps) {
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
