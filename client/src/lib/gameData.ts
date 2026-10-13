@@ -32,8 +32,9 @@ export interface Testimonial {
 const ICON_BASE = `${import.meta.env.BASE_URL}workshop-icons`;
 const ASSET_BASE = `${import.meta.env.BASE_URL}assets`;
 export const ASSET_URLS = {
-  overworld: `${ASSET_BASE}/overworld.png`,
-  heroBanner: `${ASSET_BASE}/overworld.png`,
+  overworld: `${ASSET_BASE}/overworld.webp`,
+  overworldPreview: `${ASSET_BASE}/overworld-preview.jpg`,
+  heroBanner: `${ASSET_BASE}/overworld.webp`,
   metaZone: `${ASSET_BASE}/meta-zone.png`,
   coffeeZone: `${ASSET_BASE}/coffee-zone.png`,
   farmZone: `${ASSET_BASE}/farm-zone.png`,
@@ -287,6 +288,15 @@ export const ZONES: Zone[] = [
           "I run a standing AI council: four model seats covering strategy, adversarial review, methodology, and failure modes. They debate my product decisions, and every conclusion gets recorded as a lock.",
           "I build decision gates and autonomous agents: scheduled research runs, monitoring watches, and approval-gated publishing pipelines.",
           "My daily operations run through AI. The ventures, trading drafts, research, even household ops, with memory systems that compound over time.",
+        ],
+      },
+      {
+        title: "Personal AI Practice",
+        bullets: [
+          "Operates multiple AI agents across several ventures, trading drafts, and household management. Project details in the Workshop.",
+          "Maximizes efficiency and output quality through Jev routing: a low-cost decision model screens and scores every task before frontier models are engaged.",
+          "Convenes a four-model AI council for product decisions, with seats assigned by strength across strategy, adversarial review, methodology, and failure modes. Recommendations proceed only after surviving structured challenge.",
+          "Enforces scored quality gates on all published work. Flagged batches stop for human review. Final decisions remain human.",
         ],
       },
     ],

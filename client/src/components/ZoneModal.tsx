@@ -12,9 +12,20 @@ import type { Zone } from "@/lib/gameData";
 interface ZoneModalProps {
   zone: Zone;
   onClose: () => void;
+  navigation?: {
+    index: number;
+    total: number;
+    onPrevious: () => void;
+    onNext: () => void;
+  };
+  tourLabel?: string;
+  primaryAction?: {
+    label: string;
+    onClick: () => void;
+  };
 }
 
-export default function ZoneModal({ zone, onClose }: ZoneModalProps) {
+export default function ZoneModal({ zone, onClose, navigation, tourLabel, primaryAction }: ZoneModalProps) {
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = ""; };
@@ -37,7 +48,7 @@ export default function ZoneModal({ zone, onClose }: ZoneModalProps) {
 
       {/* Modal */}
       <motion.div
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl"
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl flex flex-col"
         style={{
           background: "var(--color-rpg-parchment)",
           border: `4px solid ${zone.color}`,
@@ -49,7 +60,7 @@ export default function ZoneModal({ zone, onClose }: ZoneModalProps) {
         transition={{ type: "spring", damping: 22, stiffness: 280 }}
       >
         {/* Header image */}
-        <div className="relative h-44 sm:h-52 overflow-hidden">
+        <div className="relative h-44 sm:h-52 overflow-hidden flex-shrink-0">
           <img
             src={zone.image}
             alt={zone.name}
@@ -91,7 +102,15 @@ export default function ZoneModal({ zone, onClose }: ZoneModalProps) {
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto p-5 sm:p-6" style={{ maxHeight: "calc(90vh - 14rem)" }}>
+        <div className="overflow-y-auto p-5 sm:p-6 flex-1 min-h-0">
+          {tourLabel && (
+            <p
+              className="pixel-text text-[7px] sm:text-[8px] inline-block px-2.5 py-1.5 rounded-md mb-4"
+              style={{ background: `${zone.color}15`, color: zone.color, border: `1.5px solid ${zone.color}40` }}
+            >
+              {tourLabel}
+            </p>
+          )}
           {/* Description */}
           <motion.p
             className="text-sm sm:text-base leading-relaxed mb-5"
@@ -197,22 +216,52 @@ export default function ZoneModal({ zone, onClose }: ZoneModalProps) {
 
         {/* Bottom bar */}
         <div
-          className="px-5 py-3 border-t-2 flex items-center justify-between"
+          className="px-5 py-3 border-t-2 flex items-center justify-between gap-2 flex-wrap flex-shrink-0"
           style={{ borderColor: `${zone.color}25`, background: `${zone.color}08` }}
         >
           <div className="flex items-center gap-2">
             <span className="pixel-text text-[6px] sm:text-[7px] opacity-40">
-              ZONE EXPLORED ✓
+              {navigation ? `ZONE ${navigation.index + 1} OF ${navigation.total} · ` : ""}ZONE EXPLORED ✓
             </span>
           </div>
-          <button
-            aria-label="Close zone details"
-            onClick={onClose}
-            className="pixel-text text-[7px] sm:text-[8px] px-4 py-2 rounded-lg text-white transition-all hover:opacity-80 active:scale-95"
-            style={{ background: zone.color, boxShadow: `0 2px 0 ${zone.color}80` }}
-          >
-            CLOSE
-          </button>
+          <div className="flex items-center gap-2">
+            {primaryAction ? (
+              <button
+                onClick={primaryAction.onClick}
+                className="pixel-text text-[7px] sm:text-[8px] px-4 py-2 rounded-lg text-white transition-all hover:opacity-85 active:scale-95"
+                style={{ background: zone.color, boxShadow: `0 2px 0 ${zone.color}80` }}
+              >
+                {primaryAction.label}
+              </button>
+            ) : (
+              navigation && (
+                <>
+                  <button
+                    onClick={navigation.onPrevious}
+                    className="pixel-text text-[7px] sm:text-[8px] px-3 py-2 rounded-lg transition-all hover:opacity-80 active:scale-95"
+                    style={{ border: `2px solid ${zone.color}60`, color: zone.color, background: "transparent" }}
+                  >
+                    ← PREV
+                  </button>
+                  <button
+                    onClick={navigation.onNext}
+                    className="pixel-text text-[7px] sm:text-[8px] px-3 py-2 rounded-lg transition-all hover:opacity-80 active:scale-95"
+                    style={{ border: `2px solid ${zone.color}60`, color: zone.color, background: "transparent" }}
+                  >
+                    NEXT →
+                  </button>
+                </>
+              )
+            )}
+            <button
+              aria-label="Close zone details"
+              onClick={onClose}
+              className="pixel-text text-[7px] sm:text-[8px] px-4 py-2 rounded-lg text-white transition-all hover:opacity-80 active:scale-95"
+              style={{ background: zone.color, boxShadow: `0 2px 0 ${zone.color}80` }}
+            >
+              CLOSE
+            </button>
+          </div>
         </div>
       </motion.div>
     </motion.div>

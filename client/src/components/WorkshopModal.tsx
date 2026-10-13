@@ -4,13 +4,18 @@
  * opens its detail view (write-up + demo link) inside the same modal.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowLeft, ExternalLink, Hammer } from "lucide-react";
+import { X, ArrowLeft, ArrowRight, ExternalLink, Hammer } from "lucide-react";
 import { WORKSHOP_PROJECTS, type WorkshopProject } from "@/lib/workshopData";
 
 interface WorkshopModalProps {
   onClose: () => void;
+  selectedProjectId: string | null;
+  onSelectProject: (projectId: string) => void;
+  onBackToInventory: () => void;
+  tourLabel?: string;
+  onFinishTour?: () => void;
 }
 
 const COPPER = "#B87333";
@@ -70,9 +75,13 @@ function InventorySlot({
 function ProjectDetail({
   project,
   onBack,
+  onPrevious,
+  onNext,
 }: {
   project: WorkshopProject;
   onBack: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
 }) {
   return (
     <motion.div
@@ -157,12 +166,42 @@ function ProjectDetail({
           {project.linkLabel.toUpperCase()}
         </span>
       )}
+
+      {/* Previous / next item */}
+      <div className="flex items-center justify-between mt-6 pt-4" style={{ borderTop: `2px dashed ${COPPER}30` }}>
+        <button
+          onClick={onPrevious}
+          className="flex items-center gap-1.5 cursor-pointer transition-opacity hover:opacity-75"
+          style={{ color: COPPER }}
+          aria-label="Previous workshop item"
+        >
+          <ArrowLeft size={14} />
+          <span className="pixel-text text-[7px] sm:text-[8px]">PREV ITEM</span>
+        </button>
+        <button
+          onClick={onNext}
+          className="flex items-center gap-1.5 cursor-pointer transition-opacity hover:opacity-75"
+          style={{ color: COPPER }}
+          aria-label="Next workshop item"
+        >
+          <span className="pixel-text text-[7px] sm:text-[8px]">NEXT ITEM</span>
+          <ArrowRight size={14} />
+        </button>
+      </div>
     </motion.div>
   );
 }
 
-export default function WorkshopModal({ onClose }: WorkshopModalProps) {
-  const [selected, setSelected] = useState<WorkshopProject | null>(null);
+export default function WorkshopModal({
+  onClose,
+  selectedProjectId,
+  onSelectProject,
+  onBackToInventory,
+  tourLabel,
+  onFinishTour,
+}: WorkshopModalProps) {
+  const selected = WORKSHOP_PROJECTS.find((p) => p.id === selectedProjectId) ?? null;
+  const selectedIndex = selected ? WORKSHOP_PROJECTS.findIndex((p) => p.id === selected.id) : -1;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -186,7 +225,7 @@ export default function WorkshopModal({ onClose }: WorkshopModalProps) {
 
       {/* Modal */}
       <motion.div
-        className="relative w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-xl"
+        className="relative w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-xl flex flex-col"
         style={{
           background: "var(--color-rpg-parchment)",
           border: `4px solid ${COPPER}`,
@@ -201,7 +240,7 @@ export default function WorkshopModal({ onClose }: WorkshopModalProps) {
       >
         {/* Header */}
         <div
-          className="relative px-5 sm:px-6 pt-5 pb-4"
+          className="relative px-5 sm:px-6 pt-5 pb-4 flex-shrink-0"
           style={{
             background: COPPER_DARK,
             borderBottom: `3px solid #6B4423`,
@@ -225,6 +264,14 @@ export default function WorkshopModal({ onClose }: WorkshopModalProps) {
               <p className="text-xs sm:text-sm font-semibold" style={{ fontFamily: "'Nunito', sans-serif", color: "#FFE8C9" }}>
                 Every build is a crafted item of mine.
               </p>
+              {tourLabel && (
+                <span
+                  className="pixel-text inline-block mt-1.5 px-2 py-1 rounded text-[6px] sm:text-[7px]"
+                  style={{ background: "rgba(255,232,201,0.18)", color: "#FFE8C9", border: "1px solid rgba(255,232,201,0.4)" }}
+                >
+                  {tourLabel}
+                </span>
+              )}
             </div>
           </div>
 
@@ -238,10 +285,22 @@ export default function WorkshopModal({ onClose }: WorkshopModalProps) {
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto p-5 sm:p-6" style={{ maxHeight: "calc(90vh - 13rem)" }}>
+        <div className="overflow-y-auto p-5 sm:p-6 flex-1 min-h-0">
           <AnimatePresence mode="wait">
             {selected ? (
-              <ProjectDetail key="detail" project={selected} onBack={() => setSelected(null)} />
+              <ProjectDetail
+                key="detail"
+                project={selected}
+                onBack={onBackToInventory}
+                onPrevious={() =>
+                  onSelectProject(
+                    WORKSHOP_PROJECTS[(selectedIndex - 1 + WORKSHOP_PROJECTS.length) % WORKSHOP_PROJECTS.length].id,
+                  )
+                }
+                onNext={() =>
+                  onSelectProject(WORKSHOP_PROJECTS[(selectedIndex + 1) % WORKSHOP_PROJECTS.length].id)
+                }
+              />
             ) : (
               <motion.div key="grid" exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.18 }}>
                 <div className="space-y-3 mb-6">
@@ -262,7 +321,7 @@ export default function WorkshopModal({ onClose }: WorkshopModalProps) {
                       key={project.id}
                       project={project}
                       index={i}
-                      onSelect={() => setSelected(project)}
+                      onSelect={() => onSelectProject(project.id)}
                     />
                   ))}
                 </div>
@@ -273,20 +332,31 @@ export default function WorkshopModal({ onClose }: WorkshopModalProps) {
 
         {/* Bottom bar */}
         <div
-          className="px-5 py-3 border-t-2 flex items-center justify-between"
+          className="px-5 py-3 border-t-2 flex items-center justify-between flex-shrink-0"
           style={{ borderColor: `${COPPER}30`, background: `${COPPER}10` }}
         >
           <span className="pixel-text text-[6px] sm:text-[7px] opacity-40">
             {selected ? "ITEM INSPECTED" : "10 ITEMS IN INVENTORY"}
           </span>
-          <button
-            aria-label="Close the workshop"
-            onClick={onClose}
-            className="pixel-text text-[7px] sm:text-[8px] px-4 py-2 rounded-lg text-white transition-all hover:opacity-80 active:scale-95"
-            style={{ background: COPPER, boxShadow: `0 2px 0 ${COPPER}80` }}
-          >
-            CLOSE
-          </button>
+          <div className="flex items-center gap-2">
+            {onFinishTour && !selected && (
+              <button
+                onClick={onFinishTour}
+                className="pixel-text text-[7px] sm:text-[8px] px-4 py-2 rounded-lg text-white transition-all hover:opacity-80 active:scale-95"
+                style={{ background: "#B45309", boxShadow: "0 2px 0 #92400E" }}
+              >
+                FINISH TOUR
+              </button>
+            )}
+            <button
+              aria-label="Close the workshop"
+              onClick={onClose}
+              className="pixel-text text-[7px] sm:text-[8px] px-4 py-2 rounded-lg text-white transition-all hover:opacity-80 active:scale-95"
+              style={{ background: COPPER, boxShadow: `0 2px 0 ${COPPER}80` }}
+            >
+              CLOSE
+            </button>
+          </div>
         </div>
       </motion.div>
     </motion.div>

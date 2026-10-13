@@ -26,6 +26,13 @@ export default function PixelLoadingScreen({ onLoaded, assetsToLoad }: PixelLoad
   const [progress, setProgress] = useState(0);
   const [tipIndex, setTipIndex] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
+  const [showEnterAnyway, setShowEnterAnyway] = useState(false);
+
+  // Never trap the visitor behind a slow asset: offer a manual way in.
+  useEffect(() => {
+    const timer = setTimeout(() => setShowEnterAnyway(true), 2500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Rotate tips
   useEffect(() => {
@@ -162,6 +169,15 @@ export default function PixelLoadingScreen({ onLoaded, assetsToLoad }: PixelLoad
               {LOADING_TIPS[tipIndex]}
             </p>
           </motion.div>
+
+          {showEnterAnyway && (
+            <button
+              onClick={() => setFadeOut(true)}
+              className="pixel-text mt-6 px-5 py-2.5 rounded-lg text-[8px] text-emerald-950 bg-emerald-300 hover:bg-emerald-200 transition-colors"
+            >
+              ENTER ANYWAY
+            </button>
+          )}
 
           {/* Bottom decorative dots */}
           <div className="absolute bottom-8 flex gap-2">

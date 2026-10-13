@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Download } from "lucide-react";
 import { ASSET_URLS } from "@/lib/gameData";
 
 interface IntroScreenProps {
@@ -26,6 +27,9 @@ export default function IntroScreen({ onStart, onSkipToResume, onImmersionSelect
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
+        // Let focused buttons and links handle their own activation.
+        const target = e.target as HTMLElement | null;
+        if (target?.closest("button, a, input, textarea, select")) return;
         e.preventDefault();
         onStart();
       }
@@ -40,11 +44,11 @@ export default function IntroScreen({ onStart, onSkipToResume, onImmersionSelect
       exit={{ opacity: 0, scale: 1.1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Background - overworld map as teaser */}
+      {/* Background - lightweight preview of the overworld map */}
       <div
         className="absolute inset-0 pixel-render"
         style={{
-          backgroundImage: `url(${ASSET_URLS.overworld})`,
+          backgroundImage: `url(${ASSET_URLS.overworldPreview})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -205,6 +209,42 @@ export default function IntroScreen({ onStart, onSkipToResume, onImmersionSelect
           Client success hero at Meta by day. I know what my clients need, I bring the energy, and I build products, businesses, and pixel worlds by night.
         </motion.p>
 
+        {/* Role line — plain language for fast scanning */}
+        <motion.p
+          className="text-white/85 text-[11px] sm:text-xs font-bold leading-snug mb-2"
+          style={{ fontFamily: "'Nunito', sans-serif" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.05 }}
+        >
+          Account Manager &amp; Meta Platform Consultant · AI-Native Operator
+        </motion.p>
+
+        {/* Proof strip — the headline numbers, before any clicking */}
+        <motion.div
+          className="flex items-stretch justify-center gap-1.5 sm:gap-2 mb-3"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1 }}
+        >
+          {[
+            { value: "100/100", label: "CSAT · 76 responses" },
+            { value: "US$684K", label: "Incremental spend · 32 days" },
+            { value: "95th %ile", label: "AI usage intensity" },
+          ].map((metric) => (
+            <div
+              key={metric.label}
+              className="px-2 py-1.5 rounded-lg text-center"
+              style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.14)" }}
+            >
+              <span className="pixel-text block text-emerald-300 text-[8px] sm:text-[9px] mb-0.5">{metric.value}</span>
+              <span className="block text-white/55 text-[8px] sm:text-[9px] leading-tight" style={{ fontFamily: "'Nunito', sans-serif" }}>
+                {metric.label}
+              </span>
+            </div>
+          ))}
+        </motion.div>
+
         {/* Start button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -244,12 +284,11 @@ export default function IntroScreen({ onStart, onSkipToResume, onImmersionSelect
                 className="text-white/30 text-[9px] mb-1"
                 style={{ fontFamily: "'Nunito', sans-serif" }}
               >
-                Or choose your path:
+                Short on time? Pick a faster path:
               </p>
               <div className="flex gap-2 sm:gap-3">
                 {[
-                  { mode: "full" as const, label: "Full Adventure", icon: "⚔️", desc: "Explore everything" },
-                  { mode: "quick" as const, label: "Quick Tour", icon: "⚡", desc: "Highlights only" },
+                  { mode: "quick" as const, label: "Quick Highlights", icon: "⚡", desc: "Meta · AI Native · Workshop" },
                   { mode: "resume" as const, label: "Just the Resume", icon: "📄", desc: "Skip to resume" },
                 ].map((option, i) => (
                   <motion.button
@@ -277,6 +316,15 @@ export default function IntroScreen({ onStart, onSkipToResume, onImmersionSelect
                   </motion.button>
                 ))}
               </div>
+              <a
+                href={ASSET_URLS.resumePdf}
+                download="Marcus-Tay-Resume.pdf"
+                className="inline-flex items-center gap-1.5 mt-1 text-emerald-300/90 hover:text-emerald-200 text-[10px] sm:text-[11px] font-bold underline underline-offset-4 decoration-emerald-500/50"
+                style={{ fontFamily: "'Nunito', sans-serif" }}
+              >
+                <Download size={12} />
+                Download the résumé PDF
+              </a>
             </motion.div>
           )}
         </motion.div>

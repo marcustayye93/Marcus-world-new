@@ -6,7 +6,7 @@
  */
 
 import { motion } from "framer-motion";
-import { User, MessageSquare, Lightbulb, Map, FileText, Mail, Volume2, VolumeX } from "lucide-react";
+import { User, MessageSquare, Lightbulb, Map, FileText, Mail, Volume2, VolumeX, Sparkles } from "lucide-react";
 
 interface HUDProps {
   discoveredZones: Set<string>;
@@ -15,6 +15,7 @@ interface HUDProps {
   onAboutClick: () => void;
   onTestimonialsClick: () => void;
   onHintClick: () => void;
+  onFunFactClick?: () => void;
   onSnapshotClick?: () => void;
   onConnectClick?: () => void;
   musicMuted?: boolean;
@@ -28,6 +29,7 @@ export default function HUD({
   onAboutClick,
   onTestimonialsClick,
   onHintClick,
+  onFunFactClick,
   onSnapshotClick,
   onConnectClick,
   musicMuted,
@@ -44,7 +46,7 @@ export default function HUD({
     >
       {/* Main HUD bar */}
       <div
-        className="h-[44px] sm:h-[48px] flex items-center justify-between px-3 sm:px-5"
+        className="h-[40px] sm:h-[48px] flex items-center justify-between px-3 sm:px-5"
         style={{
           background: "linear-gradient(180deg, rgba(6,78,59,0.95) 0%, rgba(4,60,45,0.97) 100%)",
           borderBottom: "2px solid #022c22",
@@ -97,9 +99,12 @@ export default function HUD({
           )}
         </div>
 
-        {/* Right: Music toggle only */}
+        {/* Right: Hint, fun fact, music toggle */}
         <div className="flex items-center gap-1.5">
-          <HUDButton icon={<Lightbulb size={13} />} label="HINT" onClick={onHintClick} className="hidden sm:flex" variant="small" />
+          <HUDButton icon={<Lightbulb size={13} />} label="HINT" onClick={onHintClick} variant="small" />
+          {onFunFactClick && (
+            <HUDButton icon={<Sparkles size={13} />} label="FUN FACT" onClick={onFunFactClick} variant="small" />
+          )}
           {onToggleMusic && (
             <HUDButton
               icon={musicMuted ? <VolumeX size={13} /> : <Volume2 size={13} />}
@@ -113,7 +118,7 @@ export default function HUD({
 
       {/* Navigation buttons bar — prominent, separate row */}
       <div
-        className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-1.5 sm:py-2"
+        className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-1 sm:py-2"
         style={{
           background: "linear-gradient(180deg, rgba(4,60,45,0.97) 0%, rgba(2,44,34,0.95) 100%)",
           borderBottom: "3px solid #022c22",
@@ -180,7 +185,7 @@ function NavButton({
   return (
     <motion.button
       onClick={onClick}
-      className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all"
+      className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2.5 rounded-lg transition-all"
       style={{
         background: `linear-gradient(135deg, ${color}30, ${color}15)`,
         border: `2px solid ${color}70`,

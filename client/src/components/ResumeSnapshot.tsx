@@ -37,7 +37,7 @@ export default function ResumeSnapshot({ onClose }: ResumeSnapshotProps) {
 
       {/* Modal */}
       <motion.div
-        className="relative w-full max-w-3xl max-h-[92vh] overflow-hidden rounded-xl"
+        className="relative w-full max-w-3xl max-h-[92vh] overflow-hidden rounded-xl flex flex-col"
         style={{
           background: "#faf6ee",
           border: "4px solid #8B6914",
@@ -50,7 +50,7 @@ export default function ResumeSnapshot({ onClose }: ResumeSnapshotProps) {
       >
         {/* Header */}
         <div
-          className="relative px-5 sm:px-8 py-5 sm:py-6"
+          className="relative px-5 sm:px-8 py-5 sm:py-6 flex-shrink-0"
           style={{
             background: "linear-gradient(135deg, #2D5016 0%, #1a3a0a 50%, #0f2906 100%)",
           }}
@@ -93,11 +93,20 @@ export default function ResumeSnapshot({ onClose }: ResumeSnapshotProps) {
                 English · Chinese/Mandarin · Cantonese
               </span>
             </div>
+            <a
+              href={ASSET_URLS.resumePdf}
+              download="Marcus-Tay-Resume.pdf"
+              className="inline-flex items-center gap-1.5 mt-3 px-3.5 py-2 rounded-lg text-white text-xs font-bold no-underline transition-all hover:opacity-85 active:scale-95"
+              style={{ fontFamily: "'Nunito', sans-serif", background: "#1565C0", boxShadow: "0 2px 0 #0D47A1" }}
+            >
+              <Download size={13} />
+              Download résumé PDF
+            </a>
           </motion.div>
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto px-5 sm:px-8 py-5 sm:py-6" style={{ maxHeight: "calc(92vh - 12rem)" }}>
+        <div className="overflow-y-auto px-5 sm:px-8 py-5 sm:py-6 flex-1 min-h-0">
 
           {/* Summary */}
           <motion.div
@@ -462,7 +471,7 @@ export default function ResumeSnapshot({ onClose }: ResumeSnapshotProps) {
 
         {/* Bottom bar */}
         <div
-          className="px-5 sm:px-8 py-3 border-t-2 flex items-center justify-between"
+          className="px-5 sm:px-8 py-3 border-t-2 flex items-center justify-between flex-shrink-0"
           style={{ borderColor: "#8B691425", background: "#8B691408" }}
         >
           <span className="pixel-text text-[5px] sm:text-[6px] opacity-30">

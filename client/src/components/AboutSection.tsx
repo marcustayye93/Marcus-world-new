@@ -90,7 +90,7 @@ export default function AboutSection({ onClose }: AboutSectionProps) {
       />
 
       <motion.div
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl"
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl flex flex-col"
         style={{
           background: "#faf6ee",
           border: "4px solid #2E7D32",
@@ -102,7 +102,7 @@ export default function AboutSection({ onClose }: AboutSectionProps) {
         transition={{ type: "spring", damping: 22 }}
       >
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b-2 border-dashed border-emerald-200 flex items-start justify-between bg-gradient-to-r from-emerald-50 to-sky-50">
+        <div className="p-5 sm:p-6 border-b-2 border-dashed border-emerald-200 flex items-start justify-between bg-gradient-to-r from-emerald-50 to-sky-50 flex-shrink-0">
           <div className="flex items-center gap-3">
             {/* Small portrait in header */}
             <div
@@ -136,7 +136,7 @@ export default function AboutSection({ onClose }: AboutSectionProps) {
           </button>
         </div>
 
-        <div className="overflow-y-auto p-5 sm:p-6 space-y-5" style={{ maxHeight: "calc(90vh - 5rem)" }}>
+        <div className="overflow-y-auto p-5 sm:p-6 space-y-5 flex-1 min-h-0">
           {/* Three Words */}
           <motion.div
             className="flex gap-2 sm:gap-3 justify-center"

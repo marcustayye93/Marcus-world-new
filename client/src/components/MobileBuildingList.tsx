@@ -29,7 +29,8 @@ export default function MobileBuildingList({
 }: MobileBuildingListProps) {
   return (
     <div
-      className="w-full px-3 py-4"
+      id="mobile-building-list"
+      className="w-full px-3 py-4 scroll-mt-[84px]"
       style={{
         background: "linear-gradient(180deg, #1a2e1a 0%, #0f1f0f 100%)",
         borderTop: "3px solid #2E7D32",

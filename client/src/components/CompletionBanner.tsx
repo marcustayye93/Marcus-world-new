@@ -6,9 +6,12 @@
 
 import { useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
+import { Download, Mail } from "lucide-react";
+import { ASSET_URLS } from "@/lib/gameData";
 
 interface CompletionBannerProps {
   onDismiss: () => void;
+  onConnectClick?: () => void;
 }
 
 // Generate confetti particles with random properties
@@ -29,7 +32,7 @@ function useConfetti(count: number) {
   }, [count]);
 }
 
-export default function CompletionBanner({ onDismiss }: CompletionBannerProps) {
+export default function CompletionBanner({ onDismiss, onConnectClick }: CompletionBannerProps) {
   const confetti = useConfetti(50);
 
   // Play completion fanfare
@@ -156,19 +159,40 @@ export default function CompletionBanner({ onDismiss }: CompletionBannerProps) {
             className="text-[#8B7355] text-xs italic mb-6"
             style={{ fontFamily: "'Nunito', sans-serif" }}
           >
-            Want to connect? Check out the Connect section to reach Marcus directly!
+            The two useful next steps are below: take the résumé, or start a conversation.
           </p>
 
-          <motion.button
-            onClick={onDismiss}
-            className="pixel-text text-[9px] sm:text-[10px] px-6 py-3 rounded-xl text-white
-                       bg-gradient-to-b from-amber-500 to-amber-700 border-b-3 border-amber-900
-                       hover:from-amber-400 hover:to-amber-600 transition-all shadow-lg cursor-pointer"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            AWESOME!
-          </motion.button>
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <a
+              href={ASSET_URLS.resumePdf}
+              download="Marcus-Tay-Resume.pdf"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-white text-xs font-bold no-underline transition-all hover:opacity-85 active:scale-95"
+              style={{ fontFamily: "'Nunito', sans-serif", background: "#1565C0", boxShadow: "0 2px 0 #0D47A1" }}
+            >
+              <Download size={13} />
+              DOWNLOAD RÉSUMÉ
+            </a>
+            {onConnectClick && (
+              <button
+                onClick={onConnectClick}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-white text-xs font-bold transition-all hover:opacity-85 active:scale-95 cursor-pointer"
+                style={{ fontFamily: "'Nunito', sans-serif", background: "#2D5016", boxShadow: "0 2px 0 #1a3a0a" }}
+              >
+                <Mail size={13} />
+                CONNECT
+              </button>
+            )}
+            <motion.button
+              onClick={onDismiss}
+              className="pixel-text text-[9px] sm:text-[10px] px-6 py-3 rounded-xl text-white
+                         bg-gradient-to-b from-amber-500 to-amber-700 border-b-3 border-amber-900
+                         hover:from-amber-400 hover:to-amber-600 transition-all shadow-lg cursor-pointer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              AWESOME!
+            </motion.button>
+          </div>
         </div>
       </motion.div>
     </motion.div>

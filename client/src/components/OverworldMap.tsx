@@ -20,6 +20,7 @@ interface OverworldMapProps {
   discoveredZones: Set<string>;
   onZoneClick: (zone: Zone) => void;
   onSnapshotClick?: () => void;
+  highlightedZoneId?: string | null;
 }
 
 // Clickable hotspot areas over each building (percentage of map)
@@ -39,7 +40,7 @@ const BUILDING_HOTSPOTS: Record<string, {
 // Keyboard navigation order — spatial layout: top to bottom, left to right
 const KEYBOARD_NAV_ORDER = ["dfs", "meta", "music", "ai", "farm", "university", "workshop", "coffee"];
 
-export default function OverworldMap({ zones, discoveredZones, onZoneClick, onSnapshotClick }: OverworldMapProps) {
+export default function OverworldMap({ zones, discoveredZones, onZoneClick, onSnapshotClick, highlightedZoneId }: OverworldMapProps) {
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [isMobile, setIsMobile] = useState(false);
@@ -127,6 +128,21 @@ export default function OverworldMap({ zones, discoveredZones, onZoneClick, onSn
     onZoneClick(zone);
   }, [isMobile, onZoneClick]);
 
+  // Pan the mobile map so a chosen building sits in the centre of the screen
+  const panToZone = useCallback((zoneId: string) => {
+    const hotspot = BUILDING_HOTSPOTS[zoneId];
+    if (!hotspot) return;
+    setHoveredZone(zoneId);
+    hideHint();
+    if (!isMobile) return;
+    const viewportWidth = window.innerWidth;
+    const mapWidth = (MAP_WIDTH_VW / 100) * viewportWidth;
+    const centerX = ((hotspot.x + hotspot.w / 2) / 100) * mapWidth;
+    const maxDrag = -(mapWidth - viewportWidth);
+    const target = Math.max(maxDrag, Math.min(0, -(centerX - viewportWidth / 2)));
+    animate(x, target, { type: "spring", stiffness: 120, damping: 22 });
+  }, [isMobile, x, hideHint]);
+
   // Keyboard navigation — arrow keys / Tab to cycle, Enter to open
   useEffect(() => {
     if (isMobile) return;
@@ -167,7 +183,10 @@ export default function OverworldMap({ zones, discoveredZones, onZoneClick, onSn
   return (
     <div
       className="relative w-full select-none overflow-hidden"
-      style={{ height: "calc(100vh - 85px)", marginTop: "85px" }}
+      style={{
+        height: isMobile ? "62dvh" : "calc(100vh - 85px)",
+        marginTop: isMobile ? "84px" : "85px",
+      }}
       ref={containerRef}
     >
       {/* Pannable map container */}
@@ -198,7 +217,7 @@ export default function OverworldMap({ zones, discoveredZones, onZoneClick, onSn
           const isDiscovered = discoveredZones.has(zone.id);
           const isHovered = hoveredZone === zone.id;
           const isFocused = KEYBOARD_NAV_ORDER[focusedIndex] === zone.id;
-          const isHighlighted = isHovered || isFocused;
+          const isHighlighted = isHovered || isFocused || zone.id === highlightedZoneId;
           const isMeta = zone.id === "meta";
 
           return (
@@ -415,7 +434,7 @@ export default function OverworldMap({ zones, discoveredZones, onZoneClick, onSn
         href="https://www.linkedin.com/in/mtye/"
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute bottom-4 left-4 z-30 flex items-center gap-2 px-4 py-2.5 rounded-full cursor-pointer group"
+        className="absolute bottom-4 left-4 z-30 hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full cursor-pointer group"
         style={{
           background: "linear-gradient(135deg, #0077B5 0%, #005885 100%)",
           border: "2px solid rgba(255,255,255,0.25)",
@@ -434,6 +453,45 @@ export default function OverworldMap({ zones, discoveredZones, onZoneClick, onSn
           LET'S CONNECT
         </span>
       </motion.a>
+
+      {/* Mobile wayfinding — jump to the list, or pan straight to a building */}
+      {isMobile && (
+        <div
+          className="absolute inset-x-0 bottom-0 z-30 px-3 pb-3 pt-8"
+          style={{ background: "linear-gradient(180deg, transparent, rgba(6,40,24,0.6))" }}
+        >
+          <div
+            className="flex items-center gap-1.5 overflow-x-auto"
+            style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
+          >
+            <button
+              onClick={() =>
+                document.getElementById("mobile-building-list")?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="flex-shrink-0 px-3 py-2 rounded-full text-[10px] font-extrabold text-emerald-950 bg-emerald-300 shadow-md active:scale-95 transition-transform"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+            >
+              EXPLORE ZONES ↓
+            </button>
+            {zones.map((zone) => (
+              <button
+                key={zone.id}
+                onClick={() => panToZone(zone.id)}
+                className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-2 rounded-full text-[10px] font-bold text-white/90 active:scale-95 transition-transform"
+                style={{
+                  fontFamily: "'Nunito', sans-serif",
+                  background: "rgba(0,0,0,0.55)",
+                  border: hoveredZone === zone.id ? "1.5px solid #fff" : "1.5px solid rgba(255,255,255,0.25)",
+                  backdropFilter: "blur(4px)",
+                }}
+              >
+                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: zone.color }} />
+                {zone.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

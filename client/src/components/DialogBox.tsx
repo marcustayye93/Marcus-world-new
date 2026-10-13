@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { X } from "lucide-react";
 
 interface DialogBoxProps {
   message: string;
@@ -52,6 +53,15 @@ export default function DialogBox({ message, onNext, onDismiss, isLast }: Dialog
       exit={{ y: 50, opacity: 0 }}
       transition={{ type: "spring", damping: 20 }}
     >
+      {/* Explicit dismiss — always visible, including mid-typing */}
+      <button
+        aria-label="Dismiss dialogue"
+        onClick={onDismiss}
+        className="absolute -top-2 right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center text-white shadow-md transition-transform hover:scale-105 active:scale-95"
+        style={{ background: "var(--color-zone-dfs)", border: "2px solid #1B5E20" }}
+      >
+        <X size={14} />
+      </button>
       <button
         aria-label={isLast ? 'Close dialogue' : isTyping ? 'Skip typing animation' : 'Next dialogue'}
         onClick={handleClick}
