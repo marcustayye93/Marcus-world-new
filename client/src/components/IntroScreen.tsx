@@ -230,7 +230,7 @@ export default function IntroScreen({ onStart, onSkipToResume, onImmersionSelect
           {[
             { value: "100/100", label: "CSAT · 76 responses" },
             { value: "US$684K", label: "Incremental spend · 32 days" },
-            { value: "95th %ile", label: "AI usage intensity" },
+            { value: "95%", label: "AI usage intensity" },
           ].map((metric) => (
             <div
               key={metric.label}

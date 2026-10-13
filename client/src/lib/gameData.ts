@@ -328,7 +328,7 @@ export const ZONE_PROOF_METRICS: Record<string, Array<{ value: string; label: st
   ],
   ai: [
     { value: "1,799", label: "AI-assisted actions per day", icon: "\u26A1" },
-    { value: "95th %ile", label: "Company-wide AI usage intensity", icon: "\uD83C\uDFC6" },
+    { value: "95%", label: "Company-wide AI usage intensity", icon: "\uD83C\uDFC6" },
     { value: "26", label: "AI platforms across 6 functions", icon: "\uD83E\uDD16" },
   ],
   music: [
