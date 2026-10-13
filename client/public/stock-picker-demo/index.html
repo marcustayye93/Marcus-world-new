@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stock Picker — Demo Account Snapshot</title>
+<meta name="description" content="A snapshot of the Stock Picker demo account: weekly shortlist, trade setups, company explorer, and company pages.">
+<style>
+  :root { --ink:#1c1a17; --muted:#6d675e; --line:#e7e2d9; --green:#177245; --paper:#fdfcf9; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 20px 56px; }
+  .topbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 600; font-size: clamp(30px, 6vw, 44px); margin: 0; letter-spacing: -0.01em; }
+  .pill { display:inline-block; padding: 5px 12px; border-radius: 999px; background: var(--green); color:#fff; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; }
+  .intro { color: var(--muted); font-size: 16px; line-height: 1.6; margin: 16px 0 8px; max-width: 640px; }
+  figure { margin: 34px 0 0; }
+  figure img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 6px 24px rgba(28,26,23,0.08); background:#fff; }
+  figcaption { margin-top: 12px; font-size: 15px; line-height: 1.6; color: var(--muted); }
+  figcaption strong { color: var(--ink); font-family: Georgia, "Times New Roman", serif; font-size: 17px; margin-right: 6px; }
+  footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; display:flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer a { color: var(--green); font-weight: 600; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="topbar">
+      <h1>Stock Picker</h1>
+      <span class="pill">DEMO ACCOUNT</span>
+    </div>
+    <p class="intro">
+      This page is a snapshot of the Stock Picker demo account, captured on 13 October 2026.
+      The full app runs privately, so this frozen copy shows the main screens with sample data.
+      Prices on the screens are dated 25 September to 12 October 2026, and nothing here updates live.
+    </p>
+
+    <figure>
+      <img src="invest.webp" alt="Stock Picker Invest screen: the weekly shortlist of companies priced below their estimated fair value" width="1919" height="998">
+      <figcaption><strong>Invest</strong>The weekly shortlist. Companies priced below their estimated fair value, each with a confidence rating on the estimate.</figcaption>
+    </figure>
+
+    <figure>
+      <img src="trade.webp" alt="Stock Picker Trade screen: this week's technical setups with entry, stop, and target levels" width="1919" height="998">
+      <figcaption><strong>Trade</strong>Weekly technical setups that pass the trading checks, earnings included. Prices through 12 October 2026, with 305 of 305 companies checked.</figcaption>
+    </figure>
+
+    <figure>
+      <img src="browse.webp" alt="Stock Picker Browse screen: search and filters over 259 companies" width="1919" height="998">
+      <figcaption><strong>Browse</strong>The company explorer. Search and filter 259 companies by fair-value estimate, business strength, and estimate type.</figcaption>
+    </figure>
+
+    <figure>
+      <img src="company.webp" alt="Stock Picker company page for Apple Inc. with fair-value range and business health score" width="1919" height="998">
+      <figcaption><strong>Company page</strong>One share's estimated fair-value range, business health score, and past price ranges. Apple Inc. shown, priced as of 25 September 2026.</figcaption>
+    </figure>
+
+    <footer>
+      <span>Stock Picker is a personal research tool built by Marcus Tay.</span>
+      <a href="https://marcustay.net/">Back to marcustay.net</a>
+    </footer>
+  </main>
+</body>
+</html>

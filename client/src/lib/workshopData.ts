@@ -90,10 +90,10 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
     tagline: "Find stocks worth a look.",
     writeup: [
       "A stock research companion with an intrinsic value calculator, a quality scorecard, a screener, and a watchlist with price alerts.",
-      "Live and running. Go try it.",
+      "The full app runs privately. This link opens a snapshot of the demo account.",
     ],
-    demoUrl: "https://vibrant-imagination-production-d8a8.up.railway.app",
-    linkLabel: "Try it live",
+    demoUrl: "/stock-picker-demo/",
+    linkLabel: "View the demo",
   },
   {
     id: "singapore-adventure",
