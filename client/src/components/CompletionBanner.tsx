@@ -7,6 +7,7 @@
 import { useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Download, Mail } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import { ASSET_URLS } from "@/lib/gameData";
 
 interface CompletionBannerProps {
@@ -166,6 +167,7 @@ export default function CompletionBanner({ onDismiss, onConnectClick }: Completi
             <a
               href={ASSET_URLS.resumePdf}
               download="Marcus-Tay-Resume.pdf"
+              onClick={() => trackEvent("resume_download")}
               className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-white text-xs font-bold no-underline transition-all hover:opacity-85 active:scale-95"
               style={{ fontFamily: "'Nunito', sans-serif", background: "#1565C0", boxShadow: "0 2px 0 #0D47A1" }}
             >

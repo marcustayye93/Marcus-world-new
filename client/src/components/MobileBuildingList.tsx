@@ -7,6 +7,7 @@
 import { motion } from "framer-motion";
 import { FileText, User, MessageSquare, Mail } from "lucide-react";
 import type { Zone } from "@/lib/gameData";
+import { trackEvent } from "@/lib/analytics";
 
 interface MobileBuildingListProps {
   zones: Zone[];
@@ -155,6 +156,7 @@ export default function MobileBuildingList({
       {/* LinkedIn CTA for mobile */}
       <motion.a
         href="https://www.linkedin.com/in/mtye/"
+        onClick={() => trackEvent("contact_link_click", { channel: "linkedin" })}
         target="_blank"
         rel="noopener noreferrer"
         className="mt-3 flex items-center justify-center gap-2 py-2.5 rounded-xl w-full"

@@ -14,6 +14,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { ASSET_URLS, type Zone } from "@/lib/gameData";
 import AmbientAnimations from "@/components/AmbientAnimations";
+import { trackEvent } from "@/lib/analytics";
 
 interface OverworldMapProps {
   zones: Zone[];
@@ -407,10 +408,10 @@ export default function OverworldMap({ zones, discoveredZones, onZoneClick, onSn
         </motion.div>
       )}
 
-      {/* Desktop instruction hint at bottom */}
+      {/* Desktop instruction hint above the buildings */}
       {!isMobile && (
         <motion.div
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20"
+          className="absolute top-2 left-1/2 -translate-x-1/2 z-20"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
@@ -432,6 +433,7 @@ export default function OverworldMap({ zones, discoveredZones, onZoneClick, onSn
       {/* Persistent LinkedIn CTA — floating bottom-left */}
       <motion.a
         href="https://www.linkedin.com/in/mtye/"
+        onClick={() => trackEvent("contact_link_click", { channel: "linkedin" })}
         target="_blank"
         rel="noopener noreferrer"
         className="absolute bottom-4 left-4 z-30 hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full cursor-pointer group"

@@ -6,6 +6,7 @@
 import { motion } from "framer-motion";
 import { X, Quote } from "lucide-react";
 import { TESTIMONIALS } from "@/lib/gameData";
+import { trackEvent } from "@/lib/analytics";
 
 interface TestimonialsSectionProps {
   onClose: () => void;
@@ -118,6 +119,7 @@ export default function TestimonialsSection({ onClose }: TestimonialsSectionProp
               More testimonials available on{" "}
               <a
                 href="https://www.linkedin.com/in/mtye/"
+                onClick={() => trackEvent("contact_link_click", { channel: "linkedin" })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:underline"

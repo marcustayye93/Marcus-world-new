@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { X, Mail, Linkedin, Brain, Globe, Music, Coffee, Leaf, Download, Languages, Wrench, Target } from "lucide-react";
 import { ASSET_URLS } from "@/lib/gameData";
+import { trackEvent } from "@/lib/analytics";
 
 interface ResumeSnapshotProps {
   onClose: () => void;
@@ -80,11 +81,11 @@ export default function ResumeSnapshot({ onClose }: ResumeSnapshotProps) {
               Account Manager & Meta Platform Consultant | AI-Native Operator
             </p>
             <div className="flex flex-wrap gap-3 text-xs text-emerald-100/70" style={{ fontFamily: "'Nunito', sans-serif" }}>
-              <a href="mailto:marcustayye@gmail.com" className="flex items-center gap-1.5 hover:text-white transition-colors">
+              <a href="mailto:marcustayye@gmail.com" onClick={() => trackEvent("contact_link_click", { channel: "email" })} className="flex items-center gap-1.5 hover:text-white transition-colors">
                 <Mail size={13} />
                 marcustayye@gmail.com
               </a>
-              <a href="https://www.linkedin.com/in/mtye/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
+              <a href="https://www.linkedin.com/in/mtye/" onClick={() => trackEvent("contact_link_click", { channel: "linkedin" })} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
                 <Linkedin size={13} />
                 LinkedIn
               </a>
@@ -96,6 +97,7 @@ export default function ResumeSnapshot({ onClose }: ResumeSnapshotProps) {
             <a
               href={ASSET_URLS.resumePdf}
               download="Marcus-Tay-Resume.pdf"
+              onClick={() => trackEvent("resume_download")}
               className="inline-flex items-center gap-1.5 mt-3 px-3.5 py-2 rounded-lg text-white text-xs font-bold no-underline transition-all hover:opacity-85 active:scale-95"
               style={{ fontFamily: "'Nunito', sans-serif", background: "#1565C0", boxShadow: "0 2px 0 #0D47A1" }}
             >
@@ -481,6 +483,7 @@ export default function ResumeSnapshot({ onClose }: ResumeSnapshotProps) {
             <a
               href={ASSET_URLS.resumePdf}
               download="resume.pdf"
+              onClick={() => trackEvent("resume_download")}
               className="pixel-text text-[7px] sm:text-[8px] px-4 py-2 rounded-lg text-white transition-all hover:opacity-80 active:scale-95 flex items-center gap-1.5 no-underline"
               style={{ background: "#1565C0", boxShadow: "0 2px 0 #0D47A1" }}
             >

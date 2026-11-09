@@ -155,6 +155,7 @@ function HUDButton({
   return (
     <motion.button
       onClick={onClick}
+      aria-label={label === "MUTE" ? "Mute background music" : label === "UNMUTE" ? "Unmute background music" : label}
       className={`flex items-center gap-1 px-2 py-1.5 rounded-lg transition-all ${className}`}
       style={{
         background: "rgba(255, 255, 255, 0.08)",

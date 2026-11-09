@@ -9,6 +9,9 @@ export interface WorkshopProject {
   name: string;
   icon: string;
   tagline: string;
+  purpose?: string;
+  contribution?: string;
+  result?: string;
   /** Paragraphs of the write-up, rendered with breathing room between them. */
   writeup: string[];
   /** Live demo URL, or null when there is nothing public to link yet. */
@@ -17,6 +20,9 @@ export interface WorkshopProject {
 }
 
 const ICON_BASE = `${import.meta.env.BASE_URL}workshop-icons`;
+
+// Checked demos to feature first; HawkerWhere remains in the full inventory while its stall data is unavailable.
+export const FEATURED_WORKSHOP_PROJECT_IDS = ["meat-mastery", "pizzaclub", "gethowmuch"];
 
 export const WORKSHOP_PROJECTS: WorkshopProject[] = [
   {
@@ -37,6 +43,9 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
     name: "Meat Mastery",
     icon: `${ICON_BASE}/icon-meat-mastery.webp`,
     tagline: "Burgers and steaks, mastered.",
+    purpose: "Learn burger fundamentals and plan a steak around the cut you have.",
+    contribution: "Built photo-led burger lessons, a builder with live scoring and signature recipes, plus a steak planner for 7 cuts, 6 methods and 5 doneness targets.",
+    result: "Visitors can follow a lesson, build a burger or choose a steak cut, method and doneness target for a tailored guide.",
     writeup: [
       "My other food obsession.",
       "Burgers get lessons, a builder with live scoring, and signature recipes. Steak gets a designer: pick from 7 cuts, 6 methods, and 5 doneness targets, and it tells you how to get there.",
@@ -50,6 +59,9 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
     name: "Marco's Pizza Club",
     icon: `${ICON_BASE}/icon-pizza-club.webp`,
     tagline: "Pizza science for home ovens.",
+    purpose: "Learn to make better pizza in a normal home oven.",
+    contribution: "Built story-style lessons, a pizza builder with flavour meters, cook-along recipes and a dough lab, then added a pasta chapter.",
+    result: "Visitors can learn the why, experiment with dough and follow recipes for pizza and pasta.",
     writeup: [
       "I got obsessed with making real pizza in a normal home oven, and this is the result.",
       "Twelve story-style lessons, a pizza builder with live flavour meters, seven cook-along recipes, a dough lab with baker's percentages, and a full pasta chapter for good measure.",
@@ -75,6 +87,9 @@ export const WORKSHOP_PROJECTS: WorkshopProject[] = [
     name: "GetHowMuch",
     icon: `${ICON_BASE}/icon-gethowmuch.webp`,
     tagline: "Finance made easy for Singaporeans.",
+    purpose: "Help Singaporeans explore everyday personal-finance questions with calculators.",
+    contribution: "Built tools spanning retirement, income tax, CPF, car and COE, currency, mortgage and career switching.",
+    result: "Visitors can change retirement assumptions and see how those choices affect the investment estimate.",
     writeup: [
       "I built GetHowMuch around one mission: finance made easy for Singaporeans.",
       "It started with the questions I kept hearing from friends, like how much CPF will I actually have, or can I really afford this car, and grew into a hub of calculators covering retirement, income tax, CPF, car and COE, currency, mortgage, and career switch.",

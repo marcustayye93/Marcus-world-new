@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { X, Brain, Heart, Leaf, ChefHat, Mail, Linkedin, Swords, Shield, Sparkles, Music, Flame, Zap } from "lucide-react";
 import { ABOUT_ME, ASSET_URLS } from "@/lib/gameData";
+import { trackEvent } from "@/lib/analytics";
 
 interface AboutSectionProps {
   onClose: () => void;
@@ -368,6 +369,7 @@ export default function AboutSection({ onClose }: AboutSectionProps) {
             <div className="flex gap-3 justify-center">
               <a
                 href="mailto:marcustayye@gmail.com"
+                onClick={() => trackEvent("contact_link_click", { channel: "email" })}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 transition-all hover:shadow-lg active:scale-95"
                 style={{ fontFamily: "'Nunito', sans-serif" }}
               >
@@ -376,6 +378,7 @@ export default function AboutSection({ onClose }: AboutSectionProps) {
               </a>
               <a
                 href="https://www.linkedin.com/in/mtye/"
+                onClick={() => trackEvent("contact_link_click", { channel: "linkedin" })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-all hover:shadow-lg active:scale-95"

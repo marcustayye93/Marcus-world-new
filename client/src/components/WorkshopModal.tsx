@@ -7,7 +7,8 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowLeft, ArrowRight, ExternalLink, Hammer } from "lucide-react";
-import { WORKSHOP_PROJECTS, type WorkshopProject } from "@/lib/workshopData";
+import { FEATURED_WORKSHOP_PROJECT_IDS, WORKSHOP_PROJECTS, type WorkshopProject } from "@/lib/workshopData";
+import { trackEvent } from "@/lib/analytics";
 
 interface WorkshopModalProps {
   onClose: () => void;
@@ -69,6 +70,82 @@ function InventorySlot({
         </span>
       )}
     </motion.button>
+  );
+}
+
+function FeaturedProjectCard({
+  project,
+  index,
+  onSelect,
+}: {
+  project: WorkshopProject;
+  index: number;
+  onSelect: () => void;
+}) {
+  return (
+    <motion.article
+      className="rounded-xl p-4 flex flex-col"
+      style={{
+        background: "linear-gradient(180deg, #fffdf7 0%, #f5edd8 100%)",
+        border: `2px solid ${COPPER}55`,
+        boxShadow: "3px 3px 0 rgba(0,0,0,0.12)",
+      }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.06 }}
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <img
+          src={project.icon}
+          alt={`${project.name} project illustration`}
+          className="w-16 h-16 object-contain pixel-render rounded-lg p-1 flex-shrink-0"
+          style={{ background: "#fff", border: `1px solid ${COPPER}35` }}
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+        />
+        <div>
+          <h3 className="pixel-text text-[7px] sm:text-[8px] leading-relaxed" style={{ color: "#3D2B1A" }}>
+            {project.name.toUpperCase()}
+          </h3>
+          <p className="text-xs mt-1 font-semibold" style={{ fontFamily: "'Nunito', sans-serif", color: COPPER_DARK }}>
+            {project.tagline}
+          </p>
+          <span className="text-[9px] text-gray-400" style={{ fontFamily: "'Nunito', sans-serif" }}>
+            Project artwork
+          </span>
+        </div>
+      </div>
+
+      <div className="space-y-2 text-xs leading-relaxed text-gray-600 flex-1" style={{ fontFamily: "'Nunito', sans-serif" }}>
+        <p><strong className="text-gray-800">Purpose:</strong> {project.purpose}</p>
+        <p><strong className="text-gray-800">Marcus's contribution:</strong> {project.contribution}</p>
+        <p><strong className="text-gray-800">In the demo:</strong> {project.result}</p>
+      </div>
+
+      <div className="flex items-center gap-2 mt-4">
+        <button
+          type="button"
+          onClick={onSelect}
+          className="rounded-lg px-3 py-2 text-[10px] font-bold text-white transition-opacity hover:opacity-85"
+          style={{ background: COPPER_DARK, fontFamily: "'Nunito', sans-serif" }}
+        >
+          PROJECT DETAILS
+        </button>
+        {project.demoUrl && (
+          <a
+            href={project.demoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackEvent("project_demo_click", { project: project.id })}
+            className="rounded-lg px-3 py-2 text-[10px] font-bold no-underline transition-opacity hover:opacity-85"
+            style={{ color: COPPER_DARK, background: `${COPPER}18`, fontFamily: "'Nunito', sans-serif" }}
+          >
+            TRY DEMO
+          </a>
+        )}
+      </div>
+    </motion.article>
   );
 }
 
@@ -149,6 +226,7 @@ function ProjectDetail({
           }}
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96 }}
+          onClick={() => trackEvent("project_demo_click", { project: project.id })}
         >
           <ExternalLink size={16} />
           {project.linkLabel}
@@ -202,6 +280,12 @@ export default function WorkshopModal({
 }: WorkshopModalProps) {
   const selected = WORKSHOP_PROJECTS.find((p) => p.id === selectedProjectId) ?? null;
   const selectedIndex = selected ? WORKSHOP_PROJECTS.findIndex((p) => p.id === selected.id) : -1;
+  const featuredProjects = FEATURED_WORKSHOP_PROJECT_IDS
+    .map((id) => WORKSHOP_PROJECTS.find((project) => project.id === id))
+    .filter((project): project is WorkshopProject => Boolean(project));
+  const moreProjects = WORKSHOP_PROJECTS.filter(
+    (project) => !FEATURED_WORKSHOP_PROJECT_IDS.includes(project.id),
+  );
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -303,24 +387,35 @@ export default function WorkshopModal({
               />
             ) : (
               <motion.div key="grid" exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.18 }}>
-                <div className="space-y-3 mb-6">
+                <div className="space-y-2 mb-5">
                   <p className="text-sm sm:text-[15px] leading-relaxed" style={{ fontFamily: "'Nunito', sans-serif", color: "#4a4540" }}>
-                    I built these projects based on personal interests or curiosities that I've had.
+                    Start with three featured builds. Each one shows what it is for, what Marcus built, and what you can do in the demo.
                   </p>
-                  <p className="text-sm sm:text-[15px] leading-relaxed" style={{ fontFamily: "'Nunito', sans-serif", color: "#4a4540" }}>
-                    I've kept all ten of them live and playable, spanning finance, food, travel, and family.
-                  </p>
-                  <p className="text-sm sm:text-[15px] leading-relaxed" style={{ fontFamily: "'Nunito', sans-serif", color: "#4a4540" }}>
-                    Tap any item to inspect it, then go play the demo yourself.
+                  <p className="text-[11px] text-gray-500" style={{ fontFamily: "'Nunito', sans-serif" }}>
+                    The images are project artwork; use each demo link to see the live build. More projects are below.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
-                  {WORKSHOP_PROJECTS.map((project, i) => (
-                    <InventorySlot
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-7">
+                  {featuredProjects.map((project, i) => (
+                    <FeaturedProjectCard
                       key={project.id}
                       project={project}
                       index={i}
+                      onSelect={() => onSelectProject(project.id)}
+                    />
+                  ))}
+                </div>
+
+                <h3 className="pixel-text text-[7px] sm:text-[8px] mb-3" style={{ color: COPPER_DARK }}>
+                  MORE BUILDS
+                </h3>
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
+                  {moreProjects.map((project, i) => (
+                    <InventorySlot
+                      key={project.id}
+                      project={project}
+                      index={i + featuredProjects.length}
                       onSelect={() => onSelectProject(project.id)}
                     />
                   ))}

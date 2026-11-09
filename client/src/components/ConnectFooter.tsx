@@ -7,6 +7,7 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { X, Mail, Linkedin } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 interface ConnectFooterProps {
   onClose: () => void;
@@ -136,6 +137,7 @@ export default function ConnectFooter({ onClose }: ConnectFooterProps) {
             <motion.a
               key={link.label}
               href={link.href}
+              onClick={() => trackEvent("contact_link_click", { channel: link.label.toLowerCase() })}
               target={link.label === "Email" ? undefined : "_blank"}
               rel="noopener noreferrer"
               className="flex items-center gap-4 p-3 group transition-all"

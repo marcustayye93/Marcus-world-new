@@ -15,6 +15,7 @@ import IntroScreen from "@/components/IntroScreen";
 import HUD from "@/components/HUD";
 import DialogBox from "@/components/DialogBox";
 import PixelLoadingScreen from "@/components/PixelLoadingScreen";
+import { initializeAnalytics, trackEvent } from "@/lib/analytics";
 
 // Lazy-loaded: OverworldMap is large and only renders after game starts
 const OverworldMap = lazy(() => import("@/components/OverworldMap"));
@@ -31,6 +32,7 @@ const TestimonialsSection = lazy(() => import("@/components/TestimonialsSection"
 const ResumeSnapshot = lazy(() => import("@/components/ResumeSnapshot"));
 const ConnectFooter = lazy(() => import("@/components/ConnectFooter"));
 const CompletionBanner = lazy(() => import("@/components/CompletionBanner"));
+const QuickTourComplete = lazy(() => import("@/components/QuickTourComplete"));
 const MobileBuildingList = lazy(() => import("@/components/MobileBuildingList"));
 const QuestChecklist = lazy(() => import("@/components/QuestChecklist"));
 
@@ -88,6 +90,7 @@ interface SavedProgress {
   easterEggCount: number;
   completionShown: boolean;
   musicMuted: boolean;
+  musicPreferenceVersion: number;
 }
 
 function loadSavedProgress(): Partial<SavedProgress> {
@@ -129,6 +132,7 @@ export default function Home() {
   const [easterEggCount, setEasterEggCount] = useState(saved.easterEggCount ?? 0);
   const [isMobile, setIsMobile] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [showQuickTourComplete, setShowQuickTourComplete] = useState(false);
   const [completionShown, setCompletionShown] = useState(saved.completionShown ?? false);
   const [quickTourStep, setQuickTourStep] = useState<number | null>(null);
   const [highlightedZoneId, setHighlightedZoneId] = useState<string | null>(null);
@@ -139,7 +143,9 @@ export default function Home() {
   const [testimonialsOpened, setTestimonialsOpened] = useState(saved.testimonialsOpened ?? false);
 
   // Music state
-  const [musicMuted, setMusicMuted] = useState(saved.musicMuted ?? false);
+  const [musicMuted, setMusicMuted] = useState(
+    saved.musicPreferenceVersion === 1 ? (saved.musicMuted ?? true) : true,
+  );
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // How many site entries we have pushed this session (for Back-based closing)
@@ -156,6 +162,10 @@ export default function Home() {
   // opened from the grid can go Back to it; a deep-linked project cannot,
   // because the entry under it is the map.
   const workshopVisitedRef = useRef(false);
+
+  useEffect(() => {
+    initializeAnalytics();
+  }, []);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -175,6 +185,7 @@ export default function Home() {
         easterEggCount,
         completionShown,
         musicMuted,
+        musicPreferenceVersion: 1,
       };
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch {
@@ -192,28 +203,24 @@ export default function Home() {
     }
   }, [discoveredZones, completionShown]);
 
-  // Initialize audio when game starts
+  // Only create and load the soundtrack after the visitor explicitly enables it.
   useEffect(() => {
-    if (gameStarted && !audioRef.current) {
-      const audio = new Audio(ASSET_URLS.bgMusic);
+    if (!gameStarted || musicMuted) {
+      audioRef.current?.pause();
+      return;
+    }
+
+    if (!audioRef.current) {
+      const audio = new Audio();
+      audio.preload = "none";
+      audio.src = ASSET_URLS.bgMusic;
       audio.loop = true;
       audio.volume = 0.25;
-      audio.muted = musicMuted;
       audioRef.current = audio;
-      // Try to play — browsers may block autoplay until user interaction
-      audio.play().catch(() => {
-        // Autoplay blocked; will play on next user interaction
-        const playOnInteraction = () => {
-          audio.play().catch(() => {});
-          document.removeEventListener("click", playOnInteraction);
-          document.removeEventListener("keydown", playOnInteraction);
-        };
-        document.addEventListener("click", playOnInteraction);
-        document.addEventListener("keydown", playOnInteraction);
-      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameStarted]);
+
+    audioRef.current.play().catch(() => {});
+  }, [gameStarted, musicMuted]);
 
   // Sync mute state with audio element and SFX
   useEffect(() => {
@@ -449,6 +456,7 @@ export default function Home() {
       setShowTestimonials(panel === "testimonials");
       setShowSnapshot(panel === "resume");
       setShowConnect(panel === "connect");
+      if (panel === "connect") trackEvent("contact_open");
       if (panel === "resume") setResumeOpened(true);
       if (panel === "about") setAboutOpened(true);
       if (panel === "testimonials") setTestimonialsOpened(true);
@@ -513,12 +521,9 @@ export default function Home() {
 
   const handleFinishTour = useCallback(() => {
     setImmersionMode("full");
+    trackEvent("quick_highlights_complete");
     closeOverlay();
-    setTimeout(() => {
-      setDialogMessage(
-        "Quick Highlights complete. The full map is yours to explore, and every Workshop project has a live demo.",
-      );
-    }, 350);
+    window.setTimeout(() => setShowQuickTourComplete(true), 350);
   }, [closeOverlay]);
 
   /* ── Hint and fun facts ─────────────────────────────────────────────────── */
@@ -592,12 +597,13 @@ export default function Home() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (showCompletion) setShowCompletion(false);
+      else if (showQuickTourComplete) setShowQuickTourComplete(false);
       else if (dialogMessage) setDialogMessage(null);
       else if (overlayOpen) closeOverlay();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showCompletion, dialogMessage, overlayOpen, closeOverlay]);
+  }, [showCompletion, showQuickTourComplete, dialogMessage, overlayOpen, closeOverlay]);
 
   // Konami code Easter egg
   useEffect(() => {
@@ -816,6 +822,18 @@ export default function Home() {
                 </Suspense>
               )}
             </AnimatePresence>
+
+            {showQuickTourComplete && (
+              <Suspense fallback={null}>
+                <QuickTourComplete
+                  onClose={() => setShowQuickTourComplete(false)}
+                  onContactClick={() => {
+                    setShowQuickTourComplete(false);
+                    openPanel("connect");
+                  }}
+                />
+              </Suspense>
+            )}
 
             {/* Quest checklist — only show in full adventure mode */}
             {immersionMode !== "quick" && immersionMode !== "resume" && (

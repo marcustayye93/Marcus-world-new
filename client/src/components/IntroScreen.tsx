@@ -8,6 +8,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Download } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import { ASSET_URLS } from "@/lib/gameData";
 
 interface IntroScreenProps {
@@ -230,7 +231,7 @@ export default function IntroScreen({ onStart, onSkipToResume, onImmersionSelect
           {[
             { value: "100/100", label: "CSAT · 76 responses" },
             { value: "US$684K", label: "Incremental spend · 32 days" },
-            { value: "95%", label: "AI usage intensity" },
+            { value: "95th", label: "Percentile · company-wide AI usage" },
           ].map((metric) => (
             <div
               key={metric.label}
@@ -319,6 +320,7 @@ export default function IntroScreen({ onStart, onSkipToResume, onImmersionSelect
               <a
                 href={ASSET_URLS.resumePdf}
                 download="Marcus-Tay-Resume.pdf"
+                onClick={() => trackEvent("resume_download")}
                 className="inline-flex items-center gap-1.5 mt-1 text-emerald-300/90 hover:text-emerald-200 text-[10px] sm:text-[11px] font-bold underline underline-offset-4 decoration-emerald-500/50"
                 style={{ fontFamily: "'Nunito', sans-serif" }}
               >

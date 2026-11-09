@@ -3,8 +3,9 @@
  * Design: RPG-style dialog with pixel borders, zone image header, and detailed content
  */
 
-import { useEffect } from "react";
 import { motion } from "framer-motion";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { Dialog, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
 import { X, ExternalLink } from "lucide-react";
 import { ZONE_PROOF_METRICS } from "@/lib/gameData";
 import type { Zone } from "@/lib/gameData";
@@ -26,28 +27,18 @@ interface ZoneModalProps {
 }
 
 export default function ZoneModal({ zone, onClose, navigation, tourLabel, primaryAction }: ZoneModalProps) {
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
-  }, []);
-
   return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      {/* Backdrop */}
-      <motion.div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-      />
-
-      {/* Modal */}
-      <motion.div
+    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogPortal>
+        <DialogOverlay className="bg-black/60 backdrop-blur-sm" />
+        <DialogPrimitive.Content asChild aria-describedby="zone-description">
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
         className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl flex flex-col"
         style={{
           background: "var(--color-rpg-parchment)",
@@ -81,9 +72,11 @@ export default function ZoneModal({ zone, onClose, navigation, tourLabel, primar
                 {zone.icon}
               </motion.span>
               <div>
-                <h2 className="pixel-text text-white text-xs sm:text-sm drop-shadow-lg leading-relaxed">
-                  {zone.name}
-                </h2>
+                <DialogPrimitive.Title asChild>
+                  <h2 id="zone-title" className="pixel-text text-white text-xs sm:text-sm drop-shadow-lg leading-relaxed">
+                    {zone.name}
+                  </h2>
+                </DialogPrimitive.Title>
                 <p className="text-white/75 text-xs sm:text-sm font-semibold" style={{ fontFamily: "'Nunito', sans-serif" }}>
                   {zone.tagline}
                 </p>
@@ -113,6 +106,7 @@ export default function ZoneModal({ zone, onClose, navigation, tourLabel, primar
           )}
           {/* Description */}
           <motion.p
+            id="zone-description"
             className="text-sm sm:text-base leading-relaxed mb-5"
             style={{ fontFamily: "'Nunito', sans-serif", color: "#4a4540" }}
             initial={{ opacity: 0, y: 10 }}
@@ -263,7 +257,10 @@ export default function ZoneModal({ zone, onClose, navigation, tourLabel, primar
             </button>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+            </motion.div>
+          </motion.div>
+        </DialogPrimitive.Content>
+      </DialogPortal>
+    </Dialog>
   );
 }
